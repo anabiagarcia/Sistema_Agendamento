@@ -12,18 +12,18 @@ class RelatorioDiario:
 
     def gerar(self, data):
         reservas = self.repositorio.listar_reservas_por_data(data)
-        reservas_ativas = []
+        reservas_confirmadas = []
 
         for reserva in reservas:
             if not self._reserva_esta_cancelada(reserva):
-                reservas_ativas.append(reserva)
+                reservas_confirmadas.append(reserva)
 
-        if not reservas_ativas:
-            return f"Nenhuma reserva ativa encontrada para {data}."
+        if not reservas_confirmadas:
+            return f"Nenhuma reserva confirmada encontrada para {data}."
 
         reservas_por_sala = {}
 
-        for reserva in reservas_ativas:
+        for reserva in reservas_confirmadas:
             sala = reserva.get_sala()
 
             if sala not in reservas_por_sala:
