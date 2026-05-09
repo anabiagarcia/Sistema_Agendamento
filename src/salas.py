@@ -49,6 +49,15 @@ class Sala(ABC):
             int: Número da sala.
         """
         return self._numero
+    
+    def get_id(self) -> int:
+        """
+        Retorna o id da sala.
+
+        Returns:
+            int: Id da sala.
+        """
+        return self._id
 
     @abstractmethod
     def capacidade(self) -> int:

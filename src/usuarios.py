@@ -21,6 +21,15 @@ class Usuario(ABC):
 
         Usuario.proximo_id += 1
 
+    def get_id(self) -> int:
+        """
+        Retorna o id do usuário.
+
+        Returns:
+            int: Id do usuário.
+        """
+        return self._id
+    
     def get_nome(self) -> str:
         """
         Retorna o nome do usuário.

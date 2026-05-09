@@ -1,4 +1,3 @@
-from abc import ABC
 from datetime import date, time
 from enum import Enum
 from salas import Sala
@@ -69,6 +68,45 @@ class Reserva:
         """
 
         return self._sala
+    
+    def get_data(self) -> date:
+        """
+        Retorna a data da reserva.
+
+        Returns:
+            date: Data da reserva.
+        """
+
+        return self._data
+    
+    def get_horario(self) -> time:
+        """
+        Retorna o horario da reserva.
+
+        Returns:
+            time: Horario da reserva.
+        """
+
+        return self._horario
+    
+    def get_id(self) -> int:
+        """
+        Retorna o id da reserva.
+
+        Returns:
+            int: Id da reserva.
+        """
+
+        return self._id
+    
+    def get_status(self) -> StatusReserva:
+        """
+        Retorna o status da reserva.
+
+        Returns:
+            StatusReserva: Status da reserva.
+        """
+        return self._status
 
     def cancelar_reserva(self):
         """
@@ -101,7 +139,7 @@ class Reserva:
         #adicionar observer
         self._sala = sala
 
-    def set_hora(self, horario: time):
+    def set_horario(self, horario: time):
         """
         Altera o horário da reserva.
 
@@ -125,7 +163,7 @@ class Reserva:
     
     def __str__(self) -> str:
         """
-        Retorna uma representação textual dareserva.
+        Retorna uma representação textual da reserva.
 
         Returns:
             str: Informações formatadas da reserva.
@@ -133,12 +171,13 @@ class Reserva:
 
         return (
             f"{self._id} | "
-            f"Sala {self._sala.get_numero} | "
-            f"Tipo da Sala {self._sala.tipo} | "
-            f"Andar {self._sala.get_andar} | "
-            f"Usuario {self._usuario.get_nome} | "
-            f"Tipo Usuario {self._usuario.tipo} | "
+            f"Sala {self._sala.get_numero()} | "
+            f"Tipo da Sala {self._sala.tipo()} | "
+            f"Andar {self._sala.get_andar()} | "
+            f"Usuário {self._usuario.get_nome()} | "
+            f"Tipo Usuário {self._usuario.tipo()} | "
             f"Data {self._data} | "
-            f"Hora {self._horario}"
+            f"Hora {self._horario} | "
+            f"Status {self._status.value}"
         )
 

@@ -4,7 +4,7 @@ from datetime import time, timedelta
 class RepositorioReservas:
     _instance = None
     _lock = threading.Lock() # evitar problemas de concorrência
-    
+
     HORARIOS_DISPONIVEIS = [
         time(8, 0),
         time(9, 0),
@@ -16,7 +16,7 @@ class RepositorioReservas:
         time(15, 0),
         time(16, 0),
         time(17, 0),
-    ] # lista para horarios disponiveis de reserva
+    ]# lista para horarios disponiveis de reserva
 
     def __new__(cls):
         with cls._lock:
@@ -50,19 +50,19 @@ class RepositorioReservas:
 
     def buscar_sala_por_id(self, sala_id):
         for sala in self.salas:
-            if getattr(sala, "_id", None) == sala_id:
+            if sala.get_id() == sala_id:
                 return sala
         return None
 
     def buscar_usuario_por_id(self, usuario_id):
         for usuario in self.usuarios:
-            if getattr(usuario, "_id", None) == usuario_id:
+            if usuario.get_id() == usuario_id:
                 return usuario
         return None
 
     def buscar_reserva_por_id(self, reserva_id):
         for reserva in self.reservas:
-            if getattr(reserva, "_id", None) == reserva_id:
+            if reserva.get_id() == reserva_id:
                 return reserva
         return None
 
@@ -70,7 +70,7 @@ class RepositorioReservas:
         reservas_do_dia = []
 
         for reserva in self.reservas:
-            if getattr(reserva, "_data", None) == data:
+            if reserva.get_data() == data:
                 reservas_do_dia.append(reserva)
 
         return reservas_do_dia
@@ -91,8 +91,9 @@ class RepositorioReservas:
         return True
 
     def listar_salas_disponiveis(self, data_inicio, data_fim, horario):
-        if (data_inicio > data_fim):
+        if data_inicio > data_fim:
             return {}
+
         salas_disponiveis = {}
         data_atual = data_inicio
 
@@ -108,7 +109,7 @@ class RepositorioReservas:
         return salas_disponiveis
 
     def listar_horarios_disponiveis_por_periodo(self, data_inicio, data_fim):
-        if (data_inicio > data_fim):
+        if data_inicio > data_fim:
             return {}
 
         disponibilidade = {}
@@ -133,19 +134,16 @@ class RepositorioReservas:
 
     def _reserva_bloqueia_horario(self, reserva, sala, data, horario):
         mesma_sala = reserva.get_sala() == sala
-        mesma_data = getattr(reserva, "_data", None) == data
-        mesmo_horario = getattr(reserva, "_horario", None) == horario
+        mesma_data = reserva.get_data() == data
+        mesmo_horario = reserva.get_horario() == horario
         cancelada = self._reserva_esta_cancelada(reserva)
 
         return mesma_sala and mesma_data and mesmo_horario and not cancelada
 
     def _reserva_esta_cancelada(self, reserva):
-        status = getattr(reserva, "_status", None)
-        valor_status = getattr(status, "value", status)
+        return reserva.get_status().value == "Cancelada"
 
-        return valor_status == "Cancelada"
-
-    def limpar(self): # limpa dados (testes)
+    def limpar(self):
         self.salas.clear()
         self.usuarios.clear()
         self.reservas.clear()
