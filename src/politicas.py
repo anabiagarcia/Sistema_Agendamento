@@ -4,6 +4,7 @@ from datetime import date, time, datetime
 from salas import Sala
 from usuarios import Usuario, Professor
 from reservas import Reserva
+from dados import RepositorioReservas
 
 
 class StrategyReserva(ABC):
@@ -117,12 +118,10 @@ class ProxyReserva:
 class GetReserva:
     """
     Classe responsável por buscar reservas existentes.
-
-    Futuramente essa classe deverá consultar o repositório de reservas.
     """
 
     @staticmethod
-    def get_reserva( sala: Sala, data: date, horario: time) -> Reserva | None:
+    def get_reserva(sala: Sala, data: date, horario: time) -> Reserva | None:
         """
         Busca uma reserva existente para a mesma sala, data e horário.
 
@@ -135,5 +134,5 @@ class GetReserva:
             Reserva | None: Reserva encontrada ou None.
         """
 
-        # Futuramente buscar no repositório Singleton.
-        return None
+        repositorio = RepositorioReservas()
+        return repositorio.buscar_reserva_por_sala_data_horario(sala, data, horario)
