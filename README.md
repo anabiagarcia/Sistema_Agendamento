@@ -21,7 +21,7 @@ Sistema de agendamento de salas para uma instituição, permitindo cadastrar sal
 
 - RF2: Criar reservas informando sala, usuário, data (`AAAA-MM-DD`) e horário (`HH:MM`), respeitando os horários válidos de funcionamento (`08:00–17:00`) e duração fixa de 1 hora.
 
-- RF2: Modificar reservas (data, horário ou sala), realizando verificação de conflitos e aplicação das regras de prioridade.
+- RF2: Modificar reservas (usuário, data, horário ou sala), realizando verificação de conflitos e aplicação das regras de prioridade.
 
 - RF2: Cancelar reservas existentes.
 
@@ -40,7 +40,7 @@ Sistema de agendamento de salas para uma instituição, permitindo cadastrar sal
 
 - Reservas possuem duração fixa de 1 hora.
 - Horários válidos para reservas: `08:00` às `17:00`.
-- Não podem existir reservas duplicadas para a mesma sala, data e horário.
+- Não podem existir reservas confirmadas duplicadas para a mesma sala, data e horário.
 - Professores possuem prioridade sobre usuários não professores.
 
 
@@ -79,8 +79,8 @@ O menu interativo permite cadastrar salas e usuários, criar/modificar/cancelar 
 - `src/` - código-fonte
 	- `main.py` - interface de linha de comando
 	- `dados.py` - repositório e lógica de disponibilidade
-	- `salas.py` - modelos de salas e fábrica
-	- `usuarios.py` - modelos de usuários e fábrica
+	- `salas.py` - modelos de salas e factory
+	- `usuarios.py` - modelos de usuários e factory
 	- `reservas.py` - lógica da reserva e notificações
 	- `politicas.py` - proxy/strategy para criação de reservas
 	- `relatorios.py` - geração de relatórios diários
@@ -115,7 +115,7 @@ O menu interativo permite cadastrar salas e usuários, criar/modificar/cancelar 
 ## Notas de Desenvolvimento
 
 - As validações e regras de prioridade entre usuários estão implementadas em `politicas.py`.
-- O sistema de notificações utiliza o padrão Observer.
+- O sistema de notificações de mudanças utiliza o padrão Observer.
 - A criação de usuários e salas utiliza Factory.
 - As estratégias e regras de prioridade utilizam Strategy e Proxy.
 
