@@ -129,7 +129,7 @@ class Laboratorio(Sala):
     def tipo(self) -> str:
         return "Laboratório"
 
-
+#Factor
 class SalaFactory:
     """
     Classe responsável pela criação de salas.

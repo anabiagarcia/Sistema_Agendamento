@@ -6,7 +6,7 @@ from usuarios import Usuario, Professor
 from reservas import Reserva
 from dados import RepositorioReservas
 
-
+#Strategy
 class StrategyReserva(ABC):
     """
     Interface para as estratégias de criação ou alteração de reservas.
@@ -65,7 +65,10 @@ class PrioridadeProfessor(StrategyReserva):
         reserva = GetReserva.get_reserva(sala, data, horario)
 
         if reserva is None:
-            return None
+            raise ValueError("Reserva não encontrada para priorização")
+
+        if isinstance(reserva.get_usuario(), Professor):
+            raise ValueError("Sala reservada por outro professor")
 
         reserva.set_usuario(usuario)
         return reserva

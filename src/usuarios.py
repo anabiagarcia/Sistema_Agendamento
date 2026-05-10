@@ -89,7 +89,7 @@ class Manutencao(Usuario):
     def tipo(self) -> str:
         return "Manutenção"
 
-
+#Factory
 class UsuarioFactory:
     """
     Factory responsável pela criação de usuários.

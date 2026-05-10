@@ -88,12 +88,10 @@ def listar_salas():
     print("\nSalas:")
 
     for sala in salas:
-        print(
-            f"ID: {sala.get_id()}"
-            f"Numero: {sala.get_numero()}"
-            f"Andar: {sala.get_andar()}"
-            f"Tipo: {sala.tipo()}"
-        )
+        print(f"ID: {sala.get_id()}")
+        print(f" - Numero: {sala.get_numero()}")
+        print(f" - Andar: {sala.get_andar()}")
+        print(f" - Tipo: {sala.tipo()}")
 
 
 def listar_usuarios():
@@ -106,11 +104,9 @@ def listar_usuarios():
     print("\nUsuários:")
 
     for usuario in usuarios:
-        print(
-            f"ID: {usuario.get_id()}"
-            f"Nome: {usuario.get_nome()}"
-            f"Tipo: {usuario.tipo()}"
-        )
+        print(f"ID: {usuario.get_id()}")
+        print(f" - Nome: {usuario.get_nome()}")
+        print(f" - Tipo: {usuario.tipo()}")
 
 
 def listar_salas_disponiveis():
@@ -169,6 +165,10 @@ def criar_reserva():
     try:
         reserva = proxy.criar_reserva(sala, usuario, data, horario)
 
+        if reserva is None:
+            print("Reserva não foi criada.")
+            return
+
         if (reserva not in repositorio.listar_reservas()):
             repositorio.adicionar_reserva(reserva)
 
@@ -204,34 +204,37 @@ def modificar_reserva():
     print("3 - Sala")
     
     opcao = input("\nEscolha: ")
+    try:
+        if opcao == "1":
 
-    if opcao == "1":
-
-        novo_horario = input("Novo horário (HH:MM): ")
-        novo_horario = datetime.strptime(novo_horario, "%H:%M").time()
-        reserva.set_horario(novo_horario)
-    
-    elif opcao == "2":
-        nova_data = input("Nova data (AAAA-MM-DD): ")
-        nova_data = datetime.strptime(nova_data, "%Y-%m-%d").date()
-        reserva.set_data(nova_data)
-
-    elif opcao == "3":
-
-        listar_salas()
-        sala_id = int(input("\nNovo ID da sala: "))
-        nova_sala = repositorio.buscar_sala_por_id(sala_id)
-
-        if nova_sala is None:
-            print("Sala não encontrada.")
-            return
+            novo_horario = input("Novo horário (HH:MM): ")
+            novo_horario = datetime.strptime(novo_horario, "%H:%M").time()
+            reserva.set_horario(novo_horario)
         
-        reserva.set_sala(nova_sala)
+        elif opcao == "2":
+            nova_data = input("Nova data (AAAA-MM-DD): ")
+            nova_data = datetime.strptime(nova_data, "%Y-%m-%d").date()
+            reserva.set_data(nova_data)
+
+        elif opcao == "3":
+
+            listar_salas()
+            sala_id = int(input("\nNovo ID da sala: "))
+            nova_sala = repositorio.buscar_sala_por_id(sala_id)
+
+            if nova_sala is None:
+                print("Sala não encontrada.")
+                return
+            
+            reserva.set_sala(nova_sala)
+
+        else:
+            print("Opção inválida.")
         
-    else:
-        print("Opção inválida.")
-    
-    print("Reserva modificada.")
+        print("Reserva modificada.")
+
+    except ValueError as erro:
+        print(f"Erro: {erro}")
 
 
 def cancelar_reserva():

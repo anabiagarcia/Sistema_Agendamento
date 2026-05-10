@@ -39,7 +39,7 @@ class RelatorioDiario:
 
             for reserva in reservas_da_sala:
                 usuario = reserva.get_usuario()
-                horario = getattr(reserva, "_horario", None)
+                horario = reserva.get_horario()
 
                 if horario is None:
                     intervalo = "Horario nao informado"
@@ -60,7 +60,11 @@ class RelatorioDiario:
         return "\n".join(linhas)
 
     def _reserva_esta_confirmada(self, reserva):
-        status = getattr(reserva, "_status", None)
+        status = reserva.get_status()
+
+        if status is None:
+            return False
+
         valor_status = getattr(status, "value", status)
 
         return valor_status == "Confirmada"

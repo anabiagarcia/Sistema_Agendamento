@@ -2,7 +2,8 @@ from datetime import date, time
 from enum import Enum
 from notificacoes import NotificadorReservas, ObserverUsuario
 from salas import Sala
-from usuarios import Usuario
+from usuarios import Usuario, Professor
+from dados import RepositorioReservas
 
 
 class StatusReserva(Enum):
@@ -136,7 +137,6 @@ class Reserva:
         Args:
             usuario (Usuario): Novo usuário.
         """
-
         self._adicionar_observador_usuario(self._usuario)
         self._adicionar_observador_usuario(usuario)
         self._usuario = usuario
@@ -150,8 +150,20 @@ class Reserva:
             sala (Sala): Nova sala.
         """
 
-        self._sala = sala
-        self._notificar(Reserva.EVENTO_ALTERADA)
+        repositorio = RepositorioReservas()
+        conflito = repositorio.buscar_reserva_por_sala_data_horario(
+            sala, self.get_data(), self.get_horario()
+        )
+
+        if conflito is None:
+            self._sala = sala
+            self._notificar(Reserva.EVENTO_ALTERADA)
+        elif isinstance(self._usuario, Professor) and not isinstance(conflito.get_usuario(), Professor):
+            self._sala = sala
+            self._notificar(Reserva.EVENTO_ALTERADA)
+            conflito.cancelar_reserva()
+        else:
+            raise ValueError("Modificação Inválida")
 
     def set_horario(self, horario: time):
         """
@@ -160,9 +172,22 @@ class Reserva:
         Args:
             horario (time): Novo horário.
         """
+        repositorio = RepositorioReservas()
+        conflito = repositorio.buscar_reserva_por_sala_data_horario(
+            self.get_sala(), self.get_data(), horario
+        )
 
-        self._horario = horario
-        self._notificar(Reserva.EVENTO_ALTERADA)
+        if conflito is None:
+            self._horario = horario
+            self._notificar(Reserva.EVENTO_ALTERADA)
+        elif isinstance(self._usuario, Professor)and not isinstance(conflito.get_usuario(), Professor):
+            self._horario = horario
+            self._notificar(Reserva.EVENTO_ALTERADA)
+            conflito.cancelar_reserva()
+        else:
+            raise ValueError("Modificação Inválida")
+        
+        
 
     def set_data(self, data: date):
         """
@@ -171,9 +196,22 @@ class Reserva:
         Args:
             data (date): Nova data.
         """
+        repositorio = RepositorioReservas()
+        conflito = repositorio.buscar_reserva_por_sala_data_horario(
+            self.get_sala(), data, self.get_horario()
+        )
 
-        self._data = data
-        self._notificar(Reserva.EVENTO_ALTERADA)
+        if conflito is None:
+            self._data = data
+            self._notificar(Reserva.EVENTO_ALTERADA)
+        elif isinstance(self._usuario, Professor) and not isinstance(conflito.get_usuario(), Professor):
+            self._data = data
+            self._notificar(Reserva.EVENTO_ALTERADA)
+            conflito.cancelar_reserva()
+        else:
+            raise ValueError("Modificação Inválida")
+        
+        
 
     def _notificar(self, evento):
         self._notificador.notificar(evento, self)
