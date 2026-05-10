@@ -102,7 +102,7 @@ class ProxyReserva:
         if data < date.today() or (data == date.today() and horario <= datetime.now().time()):
             raise ValueError("Data e hora inválidos")
 
-        if horario.hour < 8 or horario.hour > 17:
+        if horario.hour < 8 or horario.hour > 17 or horario.minute != 0:
             raise ValueError("Horário inválido")
 
         reserva = GetReserva.get_reserva(sala, data, horario)

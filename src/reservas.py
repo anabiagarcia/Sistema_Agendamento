@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import date, time, datetime
 from enum import Enum
 from notificacoes import NotificadorReservas, ObserverUsuario
 from salas import Sala
@@ -150,6 +150,8 @@ class Reserva:
             sala (Sala): Nova sala.
         """
 
+        self._validar_data_horario(self.get_data(), self.get_horario())
+
         repositorio = RepositorioReservas()
         conflito = repositorio.buscar_reserva_por_sala_data_horario(
             sala, self.get_data(), self.get_horario()
@@ -172,6 +174,8 @@ class Reserva:
         Args:
             horario (time): Novo horário.
         """
+        self._validar_data_horario(self.get_data(), horario)
+
         repositorio = RepositorioReservas()
         conflito = repositorio.buscar_reserva_por_sala_data_horario(
             self.get_sala(), self.get_data(), horario
@@ -196,6 +200,8 @@ class Reserva:
         Args:
             data (date): Nova data.
         """
+        self._validar_data_horario(data, self.get_horario())
+
         repositorio = RepositorioReservas()
         conflito = repositorio.buscar_reserva_por_sala_data_horario(
             self.get_sala(), data, self.get_horario()
@@ -218,6 +224,13 @@ class Reserva:
 
     def _adicionar_observador_usuario(self, usuario):
         self._notificador.adicionar_observador(ObserverUsuario(usuario))
+
+    def _validar_data_horario(self, data: date, horario: time):
+        if data < date.today() or (data == date.today() and horario <= datetime.now().time()):
+            raise ValueError("Data e hora inválidos")
+
+        if horario.hour < 8 or horario.hour > 17 or horario.minute != 0:
+            raise ValueError("Horário inválido")
     
     def __str__(self) -> str:
         """
