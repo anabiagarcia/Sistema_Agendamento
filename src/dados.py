@@ -1,6 +1,7 @@
 import threading
 from datetime import time, timedelta
 
+# Singleton 
 class RepositorioReservas:
     _instance = None
     _lock = threading.Lock() # evitar problemas de concorrência
@@ -63,6 +64,12 @@ class RepositorioReservas:
     def buscar_reserva_por_id(self, reserva_id):
         for reserva in self.reservas:
             if reserva.get_id() == reserva_id:
+                return reserva
+        return None
+
+    def buscar_reserva_por_sala_data_horario(self, sala, data, horario):
+        for reserva in self.reservas:
+            if self._reserva_bloqueia_horario(reserva, sala, data, horario):
                 return reserva
         return None
 
@@ -141,7 +148,10 @@ class RepositorioReservas:
         return mesma_sala and mesma_data and mesmo_horario and not cancelada
 
     def _reserva_esta_cancelada(self, reserva):
-        return reserva.get_status().value == "Cancelada"
+        status = reserva.get_status()
+        valor_status = getattr(status, "value", status)
+
+        return valor_status == "Cancelada"
 
     def limpar(self):
         self.salas.clear()
