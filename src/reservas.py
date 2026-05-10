@@ -10,7 +10,7 @@ class StatusReserva(Enum):
     Representa os possíveis estados de uma reserva.
     """
 
-    ATIVA = "Ativa"
+    CONFIRMADA = "Confirmada"
     CANCELADA = "Cancelada"
     FINALIZADA = "Finalizada"
 
@@ -48,9 +48,9 @@ class Reserva:
         self._usuario = usuario
         self._data = data
         self._horario = horario
-        self._status = StatusReserva.ATIVA
+        self._status = StatusReserva.CONFIRMADA
         self._notificador = NotificadorReservas()
-        self._notificador.adicionar_observador(ObserverUsuario(usuario))
+        self._adicionar_observador_usuario(usuario)
 
         Reserva.proximo_id += 1
 
@@ -137,8 +137,9 @@ class Reserva:
             usuario (Usuario): Novo usuário.
         """
 
+        self._adicionar_observador_usuario(self._usuario)
+        self._adicionar_observador_usuario(usuario)
         self._usuario = usuario
-        self._notificador.adicionar_observador(ObserverUsuario(usuario))
         self._notificar(Reserva.EVENTO_ALTERADA)
 
     def set_sala(self, sala: Sala):
@@ -176,6 +177,9 @@ class Reserva:
 
     def _notificar(self, evento):
         self._notificador.notificar(evento, self)
+
+    def _adicionar_observador_usuario(self, usuario):
+        self._notificador.adicionar_observador(ObserverUsuario(usuario))
     
     def __str__(self) -> str:
         """
