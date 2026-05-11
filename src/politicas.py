@@ -160,5 +160,8 @@ class DecoratorLimpeza(StrategyReserva):
 
         if horario.hour < 8 or horario.hour > 17 or horario.minute != 0:
             raise ValueError("Horário inválido")
+
+        if GetReserva.get_reserva(sala, data, horario) is not None:
+            raise ValueError("Data e hora já estão ocupados")
         
         return self._strategy.nova_reserva(sala, usuario , data, horario)
