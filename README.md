@@ -101,13 +101,13 @@ O menu interativo permite cadastrar salas e usuários, criar/modificar/cancelar 
 ```text
 1 - Cadastrar sala
 2 - Cadastrar usuário
-3 - Criar reserva
-4 - Editar reserva
-5 - Cancelar reserva
-6 - Consultar disponibilidade
-7 - Gerar relatório diário
-8 - Listar salas
-9 - Listar usuários
+3 - Listar salas
+4 - Listar usuários
+5 - Listar salas disponíveis
+6 - Criar reserva
+7 - Modificar reserva
+8 - Cancelar reserva
+9 - Relatório diário
 10 - Cadastrar Limpeza
 0 - Sair
 ```
