@@ -2,13 +2,13 @@ from datetime import datetime
 
 from dados import RepositorioReservas
 from salas import SalaFactory
-from usuarios import UsuarioFactory
-from politicas import ProxyReserva, DecoratorLimpeza, PrimeiraReserva
+from usuarios import UsuarioFactory, Professor
+from politicas import ProxyReserva, DecoratorLimpeza, PrimeiraReserva, PrioridadeProfessor
 from relatorios import RelatorioDiario
 
 
 repositorio = RepositorioReservas()
-proxy = ProxyReserva()
+
 
 def menu():
     print("\n=== Reserva de Salas de Estudo ===")
@@ -141,6 +141,8 @@ def listar_salas_disponiveis():
 
 
 def criar_reserva():
+    proxy = ProxyReserva(PrimeiraReserva())
+
     listar_salas()
 
     sala_id = int(input("\nID da sala: "))
@@ -163,6 +165,11 @@ def criar_reserva():
 
     data = datetime.strptime(data, "%Y-%m-%d").date()
     horario = datetime.strptime(horario,"%H:%M").time()
+
+    if isinstance(usuario, Professor):
+        proxy.alterar_strategy(PrioridadeProfessor())
+    else:
+        proxy.alterar_strategy(PrimeiraReserva())
 
     try:
         reserva = proxy.criar_reserva(sala, usuario, data, horario)

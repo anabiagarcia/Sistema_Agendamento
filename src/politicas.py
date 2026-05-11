@@ -44,7 +44,13 @@ class PrimeiraReserva(StrategyReserva):
         Returns:
             Reserva: Nova reserva criada.
         """
-        return Reserva(sala, usuario, data, horario)
+        reserva = GetReserva.get_reserva(sala, data, horario)
+
+        if reserva is None:
+            return Reserva(sala, usuario, data, horario)
+        
+        else:
+            raise ValueError("Sala já reservada")
 
 
 class PrioridadeProfessor(StrategyReserva):
@@ -65,7 +71,7 @@ class PrioridadeProfessor(StrategyReserva):
         reserva = GetReserva.get_reserva(sala, data, horario)
 
         if reserva is None:
-            raise ValueError("Reserva não encontrada para priorização")
+            return Reserva(sala, usuario, data, horario)
 
         if isinstance(reserva.get_usuario(), Professor):
             raise ValueError("Sala reservada por outro professor")
@@ -75,29 +81,14 @@ class PrioridadeProfessor(StrategyReserva):
 
 
 class ProxyReserva:
-    """
-    Controla o acesso à criação de reservas.
 
-    O Proxy valida regras gerais antes de permitir a criação da reserva,
-    como data válida, horário permitido e existência de conflito.
-    """
+    def __init__(self, strategy: StrategyReserva):
+        self.strategy = strategy
+
+    def alterar_strategy(self, nova_strategy: StrategyReserva):
+        self.strategy = nova_strategy
 
     def criar_reserva(self, sala: Sala, usuario: Usuario, data: date, horario: time) -> Reserva | None:
-        """
-        Cria uma reserva aplicando as validações e estratégias necessárias.
-
-        Args:
-            sala (Sala): Sala desejada.
-            usuario (Usuario): Usuário solicitante.
-            data (date): Data desejada.
-            horario (time): Horário desejado.
-
-        Returns:
-            Reserva | None: Reserva criada ou alterada.
-
-        Raises:
-            ValueError: Quando a data, horário ou disponibilidade forem inválidos.
-        """
 
         if data < date.today() or (data == date.today() and horario <= datetime.now().time()):
             raise ValueError("Data e hora inválidos")
@@ -105,17 +96,7 @@ class ProxyReserva:
         if horario.hour < 8 or horario.hour > 17 or horario.minute != 0:
             raise ValueError("Horário inválido")
 
-        reserva = GetReserva.get_reserva(sala, data, horario)
-
-        if reserva is None:
-            strategy = PrimeiraReserva()
-            return strategy.nova_reserva(sala, usuario, data, horario)
-
-        if isinstance(usuario, Professor):
-            strategy = PrioridadeProfessor()
-            return strategy.nova_reserva(sala, usuario, data, horario)
-
-        raise ValueError("Data e hora já estão ocupados")
+        return self.strategy.nova_reserva(sala, usuario, data, horario)
 
 
 class GetReserva:
@@ -150,8 +131,8 @@ class DecoratorLimpeza(StrategyReserva):
 
     user_limpeza = UsuarioFactory.create("Manutenção", "Limpeza")
 
-    def __init__(self, usuario: StrategyReserva):
-        self._strategy = usuario
+    def __init__(self, strategy: StrategyReserva):
+        self._strategy = strategy
 
     def nova_reserva(self, sala: Sala, usuario: Usuario, data: date, horario: time) -> Reserva | None:
 
@@ -163,5 +144,5 @@ class DecoratorLimpeza(StrategyReserva):
 
         if GetReserva.get_reserva(sala, data, horario) is not None:
             raise ValueError("Data e hora já estão ocupados")
-        
-        return self._strategy.nova_reserva(sala, usuario , data, horario)
+
+        return self._strategy.nova_reserva(sala, self.user_limpeza, data, horario)
