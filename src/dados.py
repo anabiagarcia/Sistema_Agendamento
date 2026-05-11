@@ -30,71 +30,85 @@ class RepositorioReservas:
         self.salas = []
         self.usuarios = []
         self.reservas = []
+        self._data_lock = threading.RLock()
 
     def adicionar_sala(self, sala):
-        self.salas.append(sala)
+        with self._data_lock:
+            self.salas.append(sala)
 
     def adicionar_usuario(self, usuario):
-        self.usuarios.append(usuario)
+        with self._data_lock:
+            self.usuarios.append(usuario)
 
     def adicionar_reserva(self, reserva):
-        self.reservas.append(reserva)
+        with self._data_lock:
+            self.reservas.append(reserva)
 
     def listar_salas(self):
-        return self.salas
+        with self._data_lock:
+            return list(self.salas)
 
     def listar_usuarios(self):
-        return self.usuarios
+        with self._data_lock:
+            return list(self.usuarios)
 
     def listar_reservas(self):
-        return self.reservas
+        with self._data_lock:
+            return list(self.reservas)
 
     def buscar_sala_por_id(self, sala_id):
-        for sala in self.salas:
-            if sala.get_id() == sala_id:
-                return sala
+        with self._data_lock:
+            for sala in self.salas:
+                if sala.get_id() == sala_id:
+                    return sala
         return None
 
     def buscar_usuario_por_id(self, usuario_id):
-        for usuario in self.usuarios:
-            if usuario.get_id() == usuario_id:
-                return usuario
+        with self._data_lock:
+            for usuario in self.usuarios:
+                if usuario.get_id() == usuario_id:
+                    return usuario
         return None
 
     def buscar_reserva_por_id(self, reserva_id):
-        for reserva in self.reservas:
-            if reserva.get_id() == reserva_id:
-                return reserva
+        with self._data_lock:
+            for reserva in self.reservas:
+                if reserva.get_id() == reserva_id:
+                    return reserva
         return None
 
     def buscar_reserva_por_sala_data_horario(self, sala, data, horario):
-        for reserva in self.reservas:
-            if self._reserva_bloqueia_horario(reserva, sala, data, horario):
-                return reserva
+        with self._data_lock:
+            for reserva in self.reservas:
+                if self._reserva_bloqueia_horario(reserva, sala, data, horario):
+                    return reserva
         return None
 
     def listar_reservas_por_data(self, data):
         reservas_do_dia = []
 
-        for reserva in self.reservas:
-            if reserva.get_data() == data:
-                reservas_do_dia.append(reserva)
+        with self._data_lock:
+            for reserva in self.reservas:
+                if reserva.get_data() == data:
+                    reservas_do_dia.append(reserva)
 
         return reservas_do_dia
 
     def listar_reservas_por_sala(self, sala):
         reservas_da_sala = []
 
-        for reserva in self.reservas:
-            if reserva.get_sala() == sala:
-                reservas_da_sala.append(reserva)
+        with self._data_lock:
+            for reserva in self.reservas:
+                if reserva.get_sala() == sala:
+                    reservas_da_sala.append(reserva)
 
         return reservas_da_sala
 
     def sala_esta_disponivel(self, sala, data, horario):
-        for reserva in self.reservas:
-            if self._reserva_bloqueia_horario(reserva, sala, data, horario):
-                return False
+        with self._data_lock:
+            for reserva in self.reservas:
+                if self._reserva_bloqueia_horario(reserva, sala, data, horario):
+                    return False
         return True
 
     def listar_salas_disponiveis(self, data_inicio, data_fim, horario):
@@ -107,7 +121,7 @@ class RepositorioReservas:
         while data_atual <= data_fim:
             salas_disponiveis[data_atual] = []
 
-            for sala in self.salas:
+            for sala in self.listar_salas():
                 if self.sala_esta_disponivel(sala, data_atual, horario):
                     salas_disponiveis[data_atual].append(sala)
 
@@ -125,7 +139,7 @@ class RepositorioReservas:
         while data_atual <= data_fim:
             disponibilidade[data_atual] = {}
 
-            for sala in self.salas:
+            for sala in self.listar_salas():
                 horarios_livres = []
 
                 for horario in self.HORARIOS_DISPONIVEIS:
@@ -154,6 +168,7 @@ class RepositorioReservas:
         return valor_status == "Cancelada"
 
     def limpar(self):
-        self.salas.clear()
-        self.usuarios.clear()
-        self.reservas.clear()
+        with self._data_lock:
+            self.salas.clear()
+            self.usuarios.clear()
+            self.reservas.clear()
