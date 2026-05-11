@@ -1,6 +1,8 @@
 import threading
 from datetime import time, timedelta
 
+from notificacoes import NotificadorReservas
+
 # Singleton 
 class RepositorioReservas:
     _instance = None
@@ -30,6 +32,7 @@ class RepositorioReservas:
         self.salas = []
         self.usuarios = []
         self.reservas = []
+        self._notificador = NotificadorReservas()
         self._data_lock = threading.RLock()
 
     def adicionar_sala(self, sala):
@@ -43,6 +46,18 @@ class RepositorioReservas:
     def adicionar_reserva(self, reserva):
         with self._data_lock:
             self.reservas.append(reserva)
+
+    def adicionar_observador(self, observer):
+        with self._data_lock:
+            self._notificador.adicionar_observador(observer)
+
+    def remover_observador(self, observer):
+        with self._data_lock:
+            self._notificador.remover_observador(observer)
+
+    def notificar_evento_reserva(self, evento, reserva):
+        with self._data_lock:
+            self._notificador.notificar(evento, reserva)
 
     def listar_salas(self):
         with self._data_lock:
@@ -172,3 +187,4 @@ class RepositorioReservas:
             self.salas.clear()
             self.usuarios.clear()
             self.reservas.clear()
+            self._notificador.limpar_observadores()

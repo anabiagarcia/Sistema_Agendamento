@@ -53,7 +53,10 @@ class NotificadorReservas(Subject):
     def remover_observer(self, observer):
         self.remover_observador(observer)
 
+    def limpar_observadores(self):
+        self.observers.clear()
+
     # push, o notificador envia o evento e a reserva para todos os observers
     def notificar(self, evento, reserva):
-        for observer in self.observers:
+        for observer in list(self.observers):
             observer.update(evento, reserva)

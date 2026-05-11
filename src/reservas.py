@@ -221,6 +221,7 @@ class Reserva:
 
     def _notificar(self, evento):
         self._notificador.notificar(evento, self)
+        RepositorioReservas().notificar_evento_reserva(evento, self)
 
     def _adicionar_observador_usuario(self, usuario):
         self._notificador.adicionar_observador(ObserverUsuario(usuario))
@@ -251,5 +252,3 @@ class Reserva:
             f"Hora {self._horario} | "
             f"Status {self._status.value}"
         )
-    
-
