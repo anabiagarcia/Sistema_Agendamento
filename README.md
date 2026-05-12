@@ -13,27 +13,22 @@ Sistema de agendamento de salas para uma instituição, permitindo cadastrar sal
 - Consulta de disponibilidade
 - Geração de relatório diário de reservas
 - Listagem de salas e usuários
+- Reserva de limpeza usando usuário de manutenção
 
 
 ## Requisitos Funcionais
 
-- RF1: Listar salas disponíveis por período em intervalos de datas selecionados, considerando apenas datas e horários válidos.
+- RF-01: Listar salas disponíveis em um intervalo de datas, informando os horários livres de cada sala.
 
-- RF2: Criar reservas informando sala, usuário, data (`AAAA-MM-DD`) e horário (`HH:MM`), respeitando os horários válidos de funcionamento (`08:00–17:00`) e duração fixa de 1 hora.
+- RF-02: Permitir que um usuário crie, modifique ou cancele uma reserva, informando sala, usuário, data (`AAAA-MM-DD`) e horário (`HH:MM`).
 
-- RF2: Modificar reservas (usuário, data, horário ou sala), realizando verificação de conflitos e aplicação das regras de prioridade.
+- RF-03: Detectar e impedir colisões de horário, não permitindo duas reservas confirmadas para a mesma sala, data e horário, exceto quando a política de prioridade permitir substituição.
 
-- RF2: Cancelar reservas existentes.
+- RF-04: Enviar notificação aos usuários envolvidos quando uma reserva for alterada ou cancelada.
 
-- RF3: Evitar conflitos de agendamento, não permitindo duas reservas para a mesma sala, data e horário, exceto quando a regra de prioridade permitir substituição.
+- RF-05: Disponibilizar relatório diário contendo apenas reservas confirmadas e seus respectivos horários.
 
-- RF3: Aplicar política de prioridade:
-  - Usuários do tipo `Professor` podem substituir reservas realizadas por usuários não professores.
-  - Tentativas inválidas devem lançar mensagens de erro claras.
-
-- RF4: Notificar usuários quando houver modificações em reservas (data, horário ou sala).
-
-- RF5: Gerar relatório diário contendo apenas reservas confirmadas e seus respectivos horários.
+- Bônus: Permitir a criação de reserva de limpeza por meio de um decorator, usando um usuário fixo de manutenção.
 
 
 ## Regras de Negócio
@@ -42,6 +37,8 @@ Sistema de agendamento de salas para uma instituição, permitindo cadastrar sal
 - Horários válidos para reservas: `08:00` às `17:00`.
 - Não podem existir reservas confirmadas duplicadas para a mesma sala, data e horário.
 - Professores possuem prioridade sobre usuários não professores.
+- Professores podem substituir reservas feitas por usuários que não sejam professores.
+- Tentativas inválidas devem exibir mensagens de erro claras.
 
 
 ## Tecnologias Utilizadas
@@ -58,8 +55,20 @@ Sistema de agendamento de salas para uma instituição, permitindo cadastrar sal
 - Classes Abstratas
 - Factory
 - Strategy
-- Proxy
 - Observer
+- Singleton
+- Proxy
+- Decorator
+
+
+## Padrões de Projeto
+
+- `Factory`: usado em `SalaFactory` e `UsuarioFactory` para criar diferentes tipos de salas e usuários.
+- `Strategy`: usado em `PrimeiraReserva` e `PrioridadeProfessor` para selecionar a política de criação de reservas.
+- `Observer`: usado em `ObserverUsuario` e `NotificadorReservas` para notificar alterações e cancelamentos de reservas.
+- `Singleton`: usado em `RepositorioReservas` para manter um repositório único em memória, com controle de concorrência.
+- `Proxy`: usado em `ProxyReserva` para centralizar validações antes da criação de reservas.
+- `Decorator`: usado em `DecoratorLimpeza` para adicionar o comportamento de reserva de limpeza.
 
 
 
@@ -71,7 +80,7 @@ Execute o programa:
 python3 src/main.py
 ```
 
-O menu interativo permite cadastrar salas e usuários, criar/modificar/cancelar reservas e gerar relatórios.
+O menu interativo permite cadastrar salas e usuários, criar/modificar/cancelar reservas, consultar disponibilidade, gerar relatórios e criar reservas de limpeza.
 
 
 ## Estrutura do projeto
@@ -82,7 +91,7 @@ O menu interativo permite cadastrar salas e usuários, criar/modificar/cancelar 
 	- `salas.py` - modelos de salas e factory
 	- `usuarios.py` - modelos de usuários e factory
 	- `reservas.py` - lógica da reserva e notificações
-	- `politicas.py` - proxy/strategy para criação de reservas
+	- `politicas.py` - strategy, proxy e decorator para criação de reservas
 	- `relatorios.py` - geração de relatórios diários
 	- `notificacoes.py` - mecanismo de observadores/notifications
 
@@ -94,6 +103,8 @@ O menu interativo permite cadastrar salas e usuários, criar/modificar/cancelar 
 - Cadastrar usuário: menu → `2` → escolha tipo, nome
 
 - Criar reserva: menu → `6` → informe `ID` da sala, `ID` do usuário, data e horário
+
+- Criar reserva de limpeza: menu → `10` → informe `ID` da sala, data e horário
 
 
 ## Exemplo de Menu
@@ -108,7 +119,7 @@ O menu interativo permite cadastrar salas e usuários, criar/modificar/cancelar 
 7 - Modificar reserva
 8 - Cancelar reserva
 9 - Relatório diário
-10 - Cadastrar Limpeza
+10 - Criar reserva de limpeza
 0 - Sair
 ```
 
@@ -119,6 +130,8 @@ O menu interativo permite cadastrar salas e usuários, criar/modificar/cancelar 
 - O sistema de notificações de mudanças utiliza o padrão Observer.
 - A criação de usuários e salas utiliza Factory.
 - As estratégias e regras de prioridade utilizam Strategy e Proxy.
+- O repositório em memória utiliza Singleton com lock para controle básico de concorrência.
+- A reserva de limpeza utiliza Decorator como extensão opcional do projeto.
 
 
 ## Autores
